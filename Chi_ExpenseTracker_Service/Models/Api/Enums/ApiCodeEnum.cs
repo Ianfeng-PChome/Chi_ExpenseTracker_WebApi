@@ -27,9 +27,9 @@ namespace Chi_ExpenseTracker_Service.Models.Api.Enums
         InputError = 3,
 
         /// <summary>
-        /// 單據重複
+        /// 重複資料
         /// </summary>
-        DuplicatedOrder = 4,
+        DuplicatedData = 4,
 
         /// <summary>
         /// 單據不存在
@@ -55,11 +55,6 @@ namespace Chi_ExpenseTracker_Service.Models.Api.Enums
         /// 資料筆數超過限制
         /// </summary>
         RequestOverLimit = 9,
-
-        /// <summary>
-        /// 商品已有庫存
-        /// </summary>
-        ItemInStock = 10,
 
         /// <summary>
         /// 系統錯誤

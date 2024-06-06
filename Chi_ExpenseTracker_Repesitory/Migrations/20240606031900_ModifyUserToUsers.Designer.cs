@@ -4,6 +4,7 @@ using Chi_ExpenseTracker_Repesitory.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chi_ExpenseTracker_Repesitory.Migrations
 {
     [DbContext(typeof(_ExpenseDbContext))]
-    partial class _ExpenseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240606031900_ModifyUserToUsers")]
+    partial class ModifyUserToUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,29 +27,20 @@ namespace Chi_ExpenseTracker_Repesitory.Migrations
 
             modelBuilder.Entity("Chi_ExpenseTracker_Repesitory.Models.UsersEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("UserId")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .HasDefaultValueSql(" GETDATE()");
 
                     b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(255)
+                        .HasMaxLength(48)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(48)");
 
                     b.Property<string>("RefreshToken")
                         .HasMaxLength(1024)
@@ -58,15 +52,12 @@ namespace Chi_ExpenseTracker_Repesitory.Migrations
                         .HasColumnType("varchar(20)");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(88)
+                        .HasColumnType("nvarchar(88)");
 
-                    b.HasKey("Id")
-                        .HasName("PK__Users__3213E83FD8D0B2F3");
+                    b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("User", (string)null);
                 });
 #pragma warning restore 612, 618
         }

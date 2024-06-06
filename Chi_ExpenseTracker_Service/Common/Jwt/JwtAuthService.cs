@@ -9,6 +9,10 @@ using Chi_ExpenseTracker_Service.Models.Api.Enums;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Chi_ExpenseTracker_Repesitory.Models;
+using Microsoft.EntityFrameworkCore;
+using Chi_ExpenseTracker_Repesitory.Database.Repository;
+using System.Text;
+using Chi_ExpenseTracker_Service.Models.User;
 
 namespace Chi_ExpenseTracker_Service.Common.Jwt
 {
@@ -16,20 +20,52 @@ namespace Chi_ExpenseTracker_Service.Common.Jwt
     {
         private readonly IUserService? _userService;
         private readonly IHttpContextAccessor? _httpContextAccessor;
-
+        private readonly IUserRepository _userRepository;
         public JwtAuthService(IUserService userService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IUserRepository userRepository)
         {
             _userService = userService;
             _httpContextAccessor = httpContextAccessor;
+            _userRepository = userRepository;
         }
 
-        //public JwtAuthService(IServiceProvider serviceProvider)
-        //{
-        //    _userService = serviceProvider.GetService<IUserService>();
-        //    _httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
-        //}
+        /// <summary>
+        /// 註冊服務
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public ApiResponseModel Register(RegisterDto newUser)
+        {
+            var result = new ApiResponseModel();
 
+            //檢核用戶是否存在
+            UserEntity userData = _userService.GetUserByAccount(newUser.Email);
+
+            if (userData != null)
+            {
+                result.ApiResult(ApiCodeEnum.DuplicatedData);
+                result.Msg = "用戶已經存在";
+                return result;
+            }
+
+            //新增用戶
+            var newUserEntity = new UserEntity() 
+            {
+                UserName = newUser.UserName,
+                Password = newUser.Password,
+                Email = newUser.Email,
+                Role = "User",
+            };
+
+            _userRepository.Add(newUserEntity);
+
+            ///回傳ApiRes
+            result.ApiResult(ApiCodeEnum.Success);
+            result.Data = newUser;
+            return result;
+        }
+            
         /// <summary>
         /// 網頁登入驗證
         /// </summary>
@@ -38,7 +74,7 @@ namespace Chi_ExpenseTracker_Service.Common.Jwt
         public ApiResponseModel Login(JwtLoginDto jwtLoginViewModel)
         {
             UserEntity user = _userService.GetUserByAccount(jwtLoginViewModel.Account);
-
+            
             ///要回傳的Dto
             var resultData = new JwtTokenDto()
             {
@@ -52,7 +88,7 @@ namespace Chi_ExpenseTracker_Service.Common.Jwt
 
                 ///更新DB的RefreshToken
                 user.RefreshToken = refreshToken;
-                //_userRepository.UpdateRefreshToken(user);
+                _userRepository.UpdateRefreshToken(user);
 
                 resultData.Token = GenerateToken(jwtLoginViewModel, 720);
                 resultData.Refresh = refreshToken;
@@ -82,7 +118,7 @@ namespace Chi_ExpenseTracker_Service.Common.Jwt
         private string GenerateToken(JwtLoginDto jwtLoginViewModel, int expireMinutes)
         {
             var issuer = AppSettings.JwtConfig.Issuer;
-            //var signKey = AppSettings.JwtConfig.IssuerSigningKey;
+            var signKey = AppSettings.JwtConfig.IssuerSigningKey;
 
             var user = _userService.GetUserByAccount(jwtLoginViewModel.Account);
 
@@ -102,9 +138,9 @@ namespace Chi_ExpenseTracker_Service.Common.Jwt
             ClaimsIdentity userClaimsIdentity = new(claims);
 
             // SigningCredentials
-            //SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(signKey));
-            byte[] signKeyBytes = GenerateRandomKey(256); // 生成 256 位的隨機密鑰
-            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(signKeyBytes); // 將字節序列轉換為 SymmetricSecurityKey
+            SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(signKey));
+            //byte[] signKeyBytes = GenerateRandomKey(256); // 生成 256 位的隨機密鑰
+            //SymmetricSecurityKey securityKey = new SymmetricSecurityKey(signKeyBytes); // 將字節序列轉換為 SymmetricSecurityKey
             SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
             // SecurityTokenDescriptor
@@ -149,9 +185,9 @@ namespace Chi_ExpenseTracker_Service.Common.Jwt
                 tokenDto.Refresh = refreshToken;
 
                 user.RefreshToken = refreshToken;
-                //_userRepository.UpdateRefreshToken(user);
+                _userRepository.UpdateRefreshToken(user);
+                
             }
-
             return tokenDto;
         }
 

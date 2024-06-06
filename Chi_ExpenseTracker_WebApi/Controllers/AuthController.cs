@@ -1,22 +1,43 @@
-﻿using Chi_ExpenseTracker_Service.Common.Jwt;
+﻿using Chi_ExpenseTracker_Repesitory.Models;
+using Chi_ExpenseTracker_Service.Common.Jwt;
 using Chi_ExpenseTracker_Service.Models.Api;
 using Chi_ExpenseTracker_Service.Models.Jwt;
+using Chi_ExpenseTracker_Service.Models.User;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chi_ExpenseTracker_WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
-    public class LoginController : Controller
+    public class AuthController : Controller
     {
         private readonly IJwtAuthService _jwtAuth;
 
         /// <summary>
         /// JWT服務載入
         /// </summary>
-        public LoginController(IJwtAuthService jwtAuthService)
+        public AuthController(IJwtAuthService jwtAuthService)
         {
             _jwtAuth = jwtAuthService;
+        }
+
+        /// <summary>
+        /// 註冊服務
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResponseModel Register(RegisterDto newUser)
+        {
+            var result = _jwtAuth.Register(newUser);
+
+            return new ApiResponseModel
+            {
+                Code = result.Code,
+                Msg = result.Msg,
+                Data = result.Data
+            };
         }
 
         /// <summary>

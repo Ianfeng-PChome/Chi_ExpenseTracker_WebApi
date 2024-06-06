@@ -1,23 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace Chi_ExpenseTracker_Repesitory.Models
+namespace Chi_ExpenseTracker_Repesitory.Models;
+
+public partial class UserEntity
 {
-    public partial class UserEntity
-    {
-        [Key]
-        public string UserId { get; set; } = null!;
+    public int Id { get; set; }
 
-        public string? UserName { get; set; }
+    public string UserName { get; set; } = null!;
 
-        public string? Password { get; set; }
+    public string Password { get; set; } = null!;
 
-        public DateTime CreateDate { get; set; } = DateTime.Now;
+    public string Email { get; set; } = null!;
 
-        public string? RefreshToken { get; set; }
+    public DateTime CreateDate { get; set; }
 
-        public string? Role { get; set; }
-    }
+    public string? RefreshToken { get; set; }
+
+    public string? Role { get; set; }
 }
-
-

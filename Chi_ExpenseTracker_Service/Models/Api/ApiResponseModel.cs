@@ -51,7 +51,7 @@ namespace Chi_ExpenseTracker_Service.Models.Api
                     Code = "400-001";
                     Msg = msg ?? "Input Error";
                     return;
-                case ApiCodeEnum.DuplicatedOrder:
+                case ApiCodeEnum.DuplicatedData:
                     Code = "400-002";
                     Msg = msg ?? "Duplicated Order";
                     return;
@@ -66,10 +66,6 @@ namespace Chi_ExpenseTracker_Service.Models.Api
                 case ApiCodeEnum.OrderAlreadyCanceled:
                     Code = "400-005";
                     Msg = msg ?? "Order already canceled";
-                    return;
-                case ApiCodeEnum.ItemInStock:
-                    Code = "400-006";
-                    Msg = msg ?? "In Stock";
                     return;
                 case ApiCodeEnum.InsertError:
                     Code = "409-001";
